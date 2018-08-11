@@ -1,0 +1,31 @@
+{
+  "name": "moonight",
+  "version": "0.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ovilia/moonight.git"
+  },
+  "keywords": [
+    "visualization",
+    "web audio",
+    "audio"
+  ],
+  "scripts": {
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "lite": "lite-server",
+    "start": "concurrently \"npm run tsc:w\" \"npm run lite\" "
+  },
+  "author": "Ovilia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ovilia/moonight/issues"
+  },
+  "homepage": "https://github.com/Ovilia/moonight#readme",
+  "devDependencies": {
+    "concurrently": "^3.6.1",
+    "lite-server": "^2.4.0",
+    "typescript": "^3.0.1"
+  }
+}
