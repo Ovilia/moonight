@@ -10,19 +10,9 @@ export abstract class Painter {
 
     isPainted: boolean;
 
-    protected _canvas: HTMLCanvasElement;
-    protected _ctx: CanvasRenderingContext2D;
-    protected _dpr: number;
-
-    constructor(canvas: HTMLCanvasElement) {
-        this._dpr = getDpr();
-
-        canvas.width = canvas.clientWidth * this._dpr;
-        canvas.height = canvas.clientHeight * this._dpr;
-        this.width = canvas.width;
-        this.height = canvas.height;
-        this._canvas = canvas;
-        this._ctx = canvas.getContext('2d');
+    constructor(public svg: SVGSVGElement) {
+        this.width = svg.clientWidth;
+        this.height = svg.clientHeight;
 
         this.barCnt = 100;
         this.isPainted = false;
@@ -33,7 +23,7 @@ export abstract class Painter {
     }
 
     clear() {
-        this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        this.svg.innerHTML = '';
     }
 
 }

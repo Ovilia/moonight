@@ -1,17 +1,17 @@
 import rough from 'roughjs';
-import { RoughCanvasAsync } from 'roughjs/bin/canvas-async';
+import { RoughSVG } from 'roughjs/bin/svg';
 
 import { Painter } from './painter';
 
 export class SketchPainter extends Painter {
 
-    protected _rc: RoughCanvasAsync;
+    rc: RoughSVG;
 
-    constructor(canvas: HTMLCanvasElement) {
-        super(canvas);
+    constructor(svg: SVGSVGElement) {
+        super(svg);
 
         this.barCnt = 160;
-        this._rc = rough.canvas(canvas) as RoughCanvasAsync;
+        this.rc = rough.svg(svg) as RoughSVG;
     }
 
     /**
@@ -47,7 +47,7 @@ export class SketchPainter extends Painter {
             const cos = Math.cos(alpha);
             const sin = Math.sin(alpha);
 
-            this._rc.line(
+            this.rc.line(
                 cx + cos * (innerR - rectHeight),
                 cy + sin * (innerR - rectHeight),
                 cx + cos * (innerR + rectHeight),
@@ -58,17 +58,17 @@ export class SketchPainter extends Painter {
             );
         }
 
-        this._rc.circle(cx, cy, innerR * 2, {
+        this.rc.circle(cx, cy, innerR * 2, {
             roughness: 1,
             strokeWidth: 3
         });
     }
 
     protected _drawText() {
-        this._ctx.font = '55px xiaowei';
-        this._ctx.textAlign = 'center';
-        this._ctx.textBaseline = 'middle';
-        this._ctx.fillText('今夜月色真美', this.width / 2, this.height / 2);
+        // this._ctx.font = '55px xiaowei';
+        // this._ctx.textAlign = 'center';
+        // this._ctx.textBaseline = 'middle';
+        // this._ctx.fillText('今夜月色真美', this.width / 2, this.height / 2);
     }
 
     protected _drawBackground() {

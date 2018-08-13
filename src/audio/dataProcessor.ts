@@ -10,34 +10,52 @@ export class DataProcessor {
     }
 
 
-    fromRecord(record: Recorder): Float32Array {
-        if (!this.recorder) {
-            console.error('Not record yet. Please call recordStart() first.');
-            return null;
-        }
-        else {
-            return this.recorder.getChannelData();
-        }
+    fromRecord(recorder: Recorder): Promise<Float32Array> {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onloadend = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = err => {
+                reject(err);
+            }
+            fileReader.readAsArrayBuffer(recorder.getData());
+        })
+            .then(arrayBuffer => {
+                return this.fromArrayBuffer(arrayBuffer as ArrayBuffer);
+            });
     }
 
     fromFile(localPath: string): Promise<Float32Array> {
         return new Promise((resolve, reject) => {
-            const audioCtx = new AudioContext();
             var request = new XMLHttpRequest();
             request.open('GET', localPath, true);
             request.responseType = 'arraybuffer';
 
-            request.onload = function() {
-                var source = audioCtx.createBufferSource();
-                audioCtx.decodeAudioData(request.response, function(buffer) {
-                    var leftChannel = buffer.getChannelData(0);
-                    resolve(leftChannel);
-                }, function(e){
-                    console.error(e);
-                    reject(e);
-                });
+            request.onload = () => {
+                resolve(request.response);
             };
+            request.onerror = err => {
+                reject(err);
+            }
             request.send();
+        })
+            .then(arrayBuffer => {
+                return this.fromArrayBuffer(arrayBuffer as ArrayBuffer);
+            });
+    }
+
+    fromArrayBuffer(arrayBuffer: ArrayBuffer): Promise<Float32Array> {
+        return new Promise((resolve, reject) => {
+            const audioCtx = new AudioContext();
+            audioCtx.decodeAudioData(arrayBuffer, buffer => {
+                const data = buffer.getChannelData(0);
+                console.log(data);
+                resolve(data);
+            }, e => {
+                console.error(e);
+                reject(e);
+            });
         });
     }
 

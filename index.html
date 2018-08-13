@@ -7,7 +7,7 @@
     <title>Document</title>
 
     <style>
-        body, #main-canvas, #gui {
+        body, #main-svg {
             position: absolute;
             left: 0;
             top: 0;
@@ -15,13 +15,22 @@
             height: 100%;
             margin: 0;
         }
+
+        #gui {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 400px;
+            height: 80px;
+            margin-top: 120px;
+            margin-left: -200px;
+        }
     </style>
 </head>
 <body>
-    <canvas id="main-canvas"></canvas>
+    <svg id="main-svg"></svg>
 
-    <div id="gui">
-        <button id="record-btn">record</button>
-    </div>
+    <svg id="gui">
+    </svg>
 </body>
 </html>
