@@ -6,6 +6,7 @@ export class Recorder {
 
     protected _mediaRecorder;
     protected _audioChunks;
+    protected _stream: MediaStream;
 
     constructor() {
         this._audioChunks = [];
@@ -19,6 +20,7 @@ export class Recorder {
                 video: false
             })
                 .then(stream => {
+                    this._stream = stream;
                     this._mediaRecorder = new MediaRecorder(stream);
                     this._mediaRecorder.start();
                     this._audioChunks = [];
@@ -47,6 +49,8 @@ export class Recorder {
         return new Promise((resolve, reject) => {
             if (this._mediaRecorder) {
                 this._mediaRecorder.addEventListener('stop', () => {
+                    this._stream.getTracks()
+                        .forEach(track => track.stop());
                     resolve();
                 });
                 this._mediaRecorder.stop();

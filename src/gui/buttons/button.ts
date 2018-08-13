@@ -126,12 +126,9 @@ export class Button {
 
     protected _initEvent() {
         this._svgGroup.addEventListener('mousedown', () => {
-            console.log('mousedown');
             this.setDown(true)
         });
         this._svgGroup.addEventListener('mouseup', event => {
-            console.log('mouseup');
-
             if (typeof this._onClick === 'function') {
                 this._onClick(event);
             }

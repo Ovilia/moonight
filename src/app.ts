@@ -68,7 +68,9 @@ function initGUI() {
                 return dataProcessor.fromRecord(recorder);
             })
             .then(data => {
-                console.log(data);
+                const displayData = dataProcessor.getDisplayTimeDomainData(data, 80);
+                console.log(displayData);
+                painter.paint(displayData);
             });
 
         resetButtons();

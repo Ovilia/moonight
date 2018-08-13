@@ -1,5 +1,5 @@
 import { Recorder } from './recorder';
-import { shrinkArray, normalize } from '../util/array';
+import { shrinkArray, normalize, trimArray } from '../util/array';
 
 export class DataProcessor {
 
@@ -73,7 +73,9 @@ export class DataProcessor {
     }
 
     getDisplayTimeDomainData(data: Float32Array, barCnt: number): number[] {
-        return normalize(shrinkArray(data, barCnt));
+        const arr = Array.prototype.slice.call(data);
+        const trimed = trimArray(normalize(arr), 0.05);
+        return normalize(shrinkArray(trimed, barCnt));
     }
 
 }
