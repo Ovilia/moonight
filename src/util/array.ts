@@ -7,17 +7,14 @@
 */
 export function shrinkArray(source: number[], distLength: number): number[] {
     let sum = 0;
-    const step = Math.floor(source.length / distLength);
+    const step = Math.ceil(source.length / distLength);
     const dist = new Array(distLength);
-    for (let i = 0, distId = 0; distId < distLength - 1; ++i) {
+    for (let i = 0, distId = 0; distId < distLength; ++i) {
         sum += Math.abs(source[i]);
 
         if (i % step === step - 1) {
             const avg = sum / step;
             dist[distId] = isNaN(avg) ? 0 : avg;
-            if (isNaN(avg)) {
-                console.log(sum, step, i, source[i]);
-            }
             ++distId;
             sum = 0;
         }
@@ -64,6 +61,19 @@ export function normalize(arr: number[]): number[] {
         for (let i = 0; i < arr.length; ++i) {
             arr[i] = arr[i] / maxValue;
         }
+    }
+    return arr;
+}
+
+/**
+ * Changes every element of the arr to be absolute value of itself.
+ *
+ * @param arr array to be changed, it will be altered in-place
+ * @return the changed array
+ */
+export function abs(arr: number[]): number[] {
+    for (let i = 0; i < arr.length; ++i) {
+        arr[i] = Math.abs(arr[i]);
     }
     return arr;
 }

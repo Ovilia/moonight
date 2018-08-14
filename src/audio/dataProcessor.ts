@@ -1,5 +1,5 @@
 import { Recorder } from './recorder';
-import { shrinkArray, normalize, trimArray } from '../util/array';
+import { shrinkArray, normalize, trimArray, abs } from '../util/array';
 
 export class DataProcessor {
 
@@ -50,7 +50,6 @@ export class DataProcessor {
             const audioCtx = new AudioContext();
             audioCtx.decodeAudioData(arrayBuffer, buffer => {
                 const data = buffer.getChannelData(0);
-                console.log(data);
                 resolve(data);
             }, e => {
                 console.error(e);
@@ -74,7 +73,7 @@ export class DataProcessor {
 
     getDisplayTimeDomainData(data: Float32Array, barCnt: number): number[] {
         const arr = Array.prototype.slice.call(data);
-        const trimed = trimArray(normalize(arr), 0.05);
+        const trimed = trimArray(normalize(abs(arr)), 0.05);
         return normalize(shrinkArray(trimed, barCnt));
     }
 

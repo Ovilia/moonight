@@ -18,12 +18,17 @@ export abstract class Painter {
         this.isPainted = false;
     }
 
-    paint(data: number[]) {
+    paint(data: number[], text: string) {
         this.isPainted = true;
     }
 
     clear() {
-        this.svg.innerHTML = '';
+        const children = Array.prototype.slice.call(this.svg.children);
+        children.forEach(node => {
+            if (node.tagName !== 'defs') {
+                this.svg.removeChild(node);
+            }
+        });;
     }
 
 }

@@ -1,25 +1,26 @@
+import { initialAudioData } from './util/audio';
+
 import { Recorder } from './audio/recorder';
-import { CancelButton } from './gui/buttons/cancelButton';
 import { SketchPainter } from './painters/sketchPainter';
 import { DataProcessor } from './audio/dataProcessor';
 
 import { RecordButton } from './gui/buttons/recordButton';
-import { OpenButton } from './gui/buttons/openButton';
+import { DownloadButton } from './gui/buttons/download';
+import { CancelButton } from './gui/buttons/cancelButton';
 import { StopButton } from './gui/buttons/stopButton';
 import { GuiManager } from './gui/guiManager';
-import { Painter } from './painters/painter';
 
 const dataProcessor = new DataProcessor();
 
-let painter: Painter;
+let painter: SketchPainter;
 let recorder: Recorder;
 
 let guiManager: GuiManager;
 let buttons: {
     record?: RecordButton,
-    open?: OpenButton,
     stop?: StopButton,
-    cancel?: CancelButton
+    cancel?: CancelButton,
+    download?: DownloadButton
 };
 
 window.onload = init;
@@ -28,6 +29,9 @@ window.onload = init;
 function init() {
     const svg = document.getElementById('main-svg');
     painter = new SketchPainter(svg as any);
+
+    painter.paint(initialAudioData, '');
+    painter.paintTitle();
 
     recorder = new Recorder();
 
@@ -44,19 +48,21 @@ function initGUI() {
     buttons.record.onclick(recordStart);
     guiManager.addButton(buttons.record);
 
-    buttons.open = new OpenButton(svg, guiManager.rc);
-    guiManager.addButton(buttons.open);
-
     function recordStart() {
-        buttons.stop = new StopButton(svg, guiManager.rc);
-        buttons.stop.onclick(recordStop);
+        painter.paintLoading();
 
-        buttons.cancel = new CancelButton(svg, guiManager.rc);
-        buttons.cancel.onclick(recordCancel);
+        if (!buttons.stop) {
+            buttons.stop = new StopButton(svg, guiManager.rc);
+            buttons.stop.onclick(recordStop);
+        }
+
+        if (!buttons.cancel) {
+            buttons.cancel = new CancelButton(svg, guiManager.rc);
+            buttons.cancel.onclick(recordCancel);
+        }
 
         guiManager.addButton(buttons.stop);
         guiManager.addButton(buttons.cancel);
-        guiManager.removeButton(buttons.open);
         guiManager.removeButton(buttons.record);
 
         recorder.start();
@@ -68,9 +74,9 @@ function initGUI() {
                 return dataProcessor.fromRecord(recorder);
             })
             .then(data => {
-                const displayData = dataProcessor.getDisplayTimeDomainData(data, 80);
+                const displayData = dataProcessor.getDisplayTimeDomainData(data, 64);
                 console.log(displayData);
-                painter.paint(displayData);
+                painter.paint(displayData, '点击修改文字');
             });
 
         resetButtons();
@@ -84,6 +90,5 @@ function initGUI() {
         guiManager.removeButton(buttons.cancel);
         guiManager.removeButton(buttons.stop);
         guiManager.addButton(buttons.record);
-        guiManager.addButton(buttons.open);
     }
 }

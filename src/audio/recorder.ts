@@ -30,7 +30,6 @@ export class Recorder {
                             'dataavailable',
                             event => {
                                 this._audioChunks.push(event.data);
-                                console.log('dataavailable', this._audioChunks);
                                 resolve();
                             }
                         );
