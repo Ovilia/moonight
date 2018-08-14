@@ -40,6 +40,10 @@ export class GuiManager {
     }
 
     removeButton(button: Button) {
+        if (!button) {
+            return;
+        }
+
         for (let i = 0; i < this.buttons.length; ++i) {
             if (this.buttons[i] === button) {
                 this.buttons.splice(i, 1);

@@ -64,6 +64,7 @@ function initGUI() {
         guiManager.addButton(buttons.stop);
         guiManager.addButton(buttons.cancel);
         guiManager.removeButton(buttons.record);
+        guiManager.removeButton(buttons.download);
 
         recorder.start();
     }
@@ -74,9 +75,15 @@ function initGUI() {
                 return dataProcessor.fromRecord(recorder);
             })
             .then(data => {
-                const displayData = dataProcessor.getDisplayTimeDomainData(data, 64);
-                console.log(displayData);
+                const displayData = dataProcessor
+                    .getDisplayTimeDomainData(data, 64);
                 painter.paint(displayData, '点击修改文字');
+
+                if (!buttons.download) {
+                    buttons.download = new DownloadButton(svg, guiManager.rc);
+                    buttons.download.onclick(downloadImage);
+                    guiManager.addButton(buttons.download);
+                }
             });
 
         resetButtons();
@@ -89,6 +96,11 @@ function initGUI() {
     function resetButtons() {
         guiManager.removeButton(buttons.cancel);
         guiManager.removeButton(buttons.stop);
+        guiManager.removeButton(buttons.download);
         guiManager.addButton(buttons.record);
+    }
+
+    function downloadImage() {
+        painter.saveImage(1000, 1000);
     }
 }

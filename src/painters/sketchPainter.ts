@@ -170,7 +170,8 @@ export class SketchPainter extends Painter {
     ): SVGElement {
         const path = this.rc.path(svgPath, {
             fill: 'black',
-            fillStyle: 'zigzag'
+            fillStyle: 'zigzag',
+            roughness: 0.8
         });
 
         const scale = displayWidth / svgSize[0];
