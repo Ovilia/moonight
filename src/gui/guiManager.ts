@@ -2,6 +2,7 @@ import { RoughSVG } from 'roughjs/bin/svg';
 import rough from 'roughjs';
 
 import { Button } from './buttons/button';
+import { getSize } from '../util/svg';
 
 export class GuiManager {
 
@@ -18,8 +19,12 @@ export class GuiManager {
     constructor(public svg: SVGSVGElement) {
         this.buttons = [];
 
-        this.width = svg.clientWidth;
-        this.height = svg.clientHeight;
+        const size = getSize(svg, 400, 80);
+        this.width = size.width;
+        this.height = size.height;
+        console.log(size);
+        svg.setAttribute('width', this.width + '');
+        svg.setAttribute('height', this.height + '');
 
         this.btnRadius = 25;
         this.btnMargin = 10;

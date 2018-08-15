@@ -41,8 +41,12 @@
 </head>
 <body>
     <svg id="main-svg"></svg>
+    <svg id="gui"></svg>
 
-    <svg id="gui">
-    </svg>
+    <script>
+        if (!window.MediaRecorder) {
+            document.write(decodeURI('%3Cscript src="./polyfill.js">%3C/script>'));
+        }
+    </script>
 <script type="text/javascript" src="app.js"></script></body>
 </html>

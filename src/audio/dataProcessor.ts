@@ -1,5 +1,6 @@
 import { Recorder } from './recorder';
 import { shrinkArray, normalize, trimArray, abs } from '../util/array';
+import { getAudioContext } from '../util/env';
 
 export class DataProcessor {
 
@@ -47,6 +48,7 @@ export class DataProcessor {
 
     fromArrayBuffer(arrayBuffer: ArrayBuffer): Promise<Float32Array> {
         return new Promise((resolve, reject) => {
+            const AudioContext = getAudioContext();
             const audioCtx = new AudioContext();
             audioCtx.decodeAudioData(arrayBuffer, buffer => {
                 const data = buffer.getChannelData(0);

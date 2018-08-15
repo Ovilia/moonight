@@ -9,6 +9,7 @@ import { DownloadButton } from './gui/buttons/download';
 import { CancelButton } from './gui/buttons/cancelButton';
 import { StopButton } from './gui/buttons/stopButton';
 import { GuiManager } from './gui/guiManager';
+import { mediaRecorderSupported, audioSupported } from './util/env';
 
 const dataProcessor = new DataProcessor();
 
@@ -27,8 +28,12 @@ window.onload = init;
 
 
 function init() {
-    const svg = document.getElementById('main-svg');
-    painter = new SketchPainter(svg as any);
+    if (!mediaRecorderSupported() || !audioSupported()) {
+        location.href = 'not-supported.html';
+    }
+
+    const svg = document.getElementById('main-svg') as any;
+    painter = new SketchPainter(svg);
 
     painter.paint(initialAudioData, '');
     painter.paintTitle();

@@ -1,5 +1,4 @@
-import { getDpr } from '../util/device';
-import { saveSvgAsPng } from 'save-svg-as-png';
+import { getSize } from '../util/svg';
 
 export abstract class Painter {
 
@@ -12,8 +11,12 @@ export abstract class Painter {
     isPainted: boolean;
 
     constructor(public svg: SVGSVGElement) {
-        this.width = svg.clientWidth;
-        this.height = svg.clientHeight;
+        const size = getSize(svg, 400, 400);
+
+        svg.setAttribute('width', size.width + '');
+        svg.setAttribute('height', size.height + '');
+        this.width = size.width;
+        this.height = size.height;
 
         this.barCnt = 100;
         this.isPainted = false;
