@@ -6,7 +6,7 @@ module.exports = {
     app: './src/app.ts',
     polyfill: './src/polyfill.ts'
   },
-  //devtool: 'inline-source-map',
+  // devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -26,7 +26,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: true,
+      inject: false,
       chunks: ['app']
     })
   ]

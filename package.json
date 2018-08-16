@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "audio-recorder-polyfill": "^0.1.2",
+    "md-gum-polyfill": "^1.0.0",
     "roughjs": "^2.2.5"
   }
 }
