@@ -22,7 +22,6 @@ export class GuiManager {
         const size = getSize(svg, 400, 80);
         this.width = size.width;
         this.height = size.height;
-        console.log(size);
         svg.setAttribute('width', this.width + '');
         svg.setAttribute('height', this.height + '');
 

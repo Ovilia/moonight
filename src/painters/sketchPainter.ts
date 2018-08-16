@@ -14,6 +14,7 @@ export class SketchPainter extends Painter {
 
     protected _innerR: number;
     protected _text: SVGElement;
+    protected _textStr: string;
     protected _title: SVGElement;
 
     constructor(svg: SVGSVGElement) {
@@ -22,6 +23,7 @@ export class SketchPainter extends Painter {
         this.barCnt = 160;
         this.rc = rough.svg(svg) as RoughSVG;
         this._text = null;
+        this._textStr = '';
     }
 
     /**
@@ -89,42 +91,48 @@ export class SketchPainter extends Painter {
         outSvg.setAttribute('width', '400');
         outSvg.setAttribute('height', '600');
 
-        if (mobile) {
-            const contentGroup = createNode('g');
-            contentGroup.innerHTML = this.svg.innerHTML;
-            contentGroup.setAttribute('transform', 'translate(0, 90)');
-            outSvg.appendChild(contentGroup);
+        // Remove text since font is not converted fron svg to canvas
+        if (this._text) {
+            this.svg.removeChild(this._text);
+            // Not setting this._text to null so that it can be accessed in
+            // _wrapCanvas
         }
+
+        const contentGroup = createNode('g');
+        contentGroup.innerHTML = this.svg.innerHTML;
+        contentGroup.setAttribute('transform', 'translate(0, 90)');
+        outSvg.appendChild(contentGroup);
 
         const dpr = 2;
         svgToCanvas(outSvg, dpr).then(canvas => {
-            if (mobile) {
                 this._wrapCanvas(canvas, dpr)
                     .then(() => {
                         const base64 = canvas.toDataURL('image/png');
-                        const img = document.createElement('img');
-                        img.setAttribute('src', base64);
-                        img.setAttribute('class', 'full-img');
 
-                        const oldSvg = document.getElementsByTagName('svg');
-                        const len = oldSvg.length;
-                        for (let i = 0; i < len; ++i) {
-                            document.body.removeChild(oldSvg[0]);
+                        if (mobile) {
+                            const img = document.createElement('img');
+                            img.setAttribute('src', base64);
+                            img.setAttribute('class', 'full-img');
+
+                            const oldSvg = document.getElementsByTagName('svg');
+                            const len = oldSvg.length;
+                            for (let i = 0; i < len; ++i) {
+                                document.body.removeChild(oldSvg[0]);
+                            }
+                            document.body.appendChild(img);
+
+                            const hint = document.getElementById('hint');
+                            hint.style.display = 'block';
                         }
-                        document.body.appendChild(img);
-
-                        const hint = document.getElementById('hint');
-                        hint.style.display = 'block';
+                        else {
+                            const a = document.createElement('a');
+                            a.download = 'moonight.png';
+                            a.href = base64.replace(/^data:image\/[^;]/,
+                                'data:application/octet-stream');
+                            a.click();
+                            this.svg.appendChild(this._text);
+                        }
                     });
-            }
-            else {
-                const base64 = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.download = 'moonight.png';
-                a.href = base64.replace(/^data:image\/[^;]/,
-                    'data:application/octet-stream');
-                a.click();
-            }
         });
     }
 
@@ -151,6 +159,16 @@ export class SketchPainter extends Painter {
         ctx.fillStyle = '#777';
         ctx.fillText('https://umeecorn.com/moonight', 25 * dpr, 560 * dpr);
         ctx.fillText('GitHub: Ovilia/moonight', 25 * dpr, 575 * dpr);
+
+        // text in the center
+        const fontSize = parseInt(this._text.style.font, 10);
+        ctx.font = fontSize * dpr + 'px xiaowei';
+        const x = +this._text.getAttribute('x');
+        const y = +this._text.getAttribute('y') + 90;
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this._textStr, x * dpr, y * dpr);
 
         // qr
         const qrImg = new Image();
@@ -245,6 +263,7 @@ export class SketchPainter extends Painter {
         text.style.font = fontSize + 'px xiaowei';
 
         this._text = text;
+        this._textStr = words;
     }
 
     protected _drawSVGText(

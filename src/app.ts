@@ -31,7 +31,8 @@ window.onload = init;
 function init() {
     if (isWeixin()) {
         const hint = document.getElementById('hint');
-        hint.innerHTML = '请在右上角打开浏览器访问';
+        hint.innerHTML = '右上角在 Safari 中打开';
+        hint.style.display = 'block';
     }
     else {
         initGUI();
@@ -116,6 +117,9 @@ function initGUI() {
     }
 
     function recordCancel() {
+        recorder.stop();
+        painter.paint(initialAudioData, '');
+        painter.paintTitle();
         resetButtons();
     }
 
