@@ -1,3 +1,6 @@
+declare const require;
+require('md-gum-polyfill');
+
 import { initialAudioData } from './util/audio';
 
 import { Recorder } from './audio/recorder';
@@ -9,7 +12,8 @@ import { DownloadButton } from './gui/buttons/download';
 import { CancelButton } from './gui/buttons/cancelButton';
 import { StopButton } from './gui/buttons/stopButton';
 import { GuiManager } from './gui/guiManager';
-import { mediaRecorderSupported, audioSupported } from './util/env';
+import { mediaRecorderSupported, audioSupported, getUserMediaSupported, logEvent }
+    from './util/env';
 import { getUserMedia, isWeixin } from './util/device';
 
 const dataProcessor = new DataProcessor();
@@ -38,7 +42,13 @@ function init() {
         initGUI();
     }
 
-    if (!mediaRecorderSupported() || !audioSupported()) {
+    logEvent('env', 'recorder', mediaRecorderSupported());
+    logEvent('env', 'audio', audioSupported());
+    logEvent('env', 'media', getUserMediaSupported());
+
+    if (!mediaRecorderSupported() || !audioSupported()
+        || !getUserMediaSupported()
+    ) {
         location.href = 'not-supported.html';
     }
 
@@ -52,23 +62,32 @@ function init() {
         });
 
     const svg = document.getElementById('main-svg') as any;
+
+    if (window.innerWidth < 400) {
+        svg.style['margin-left'] = -window.innerWidth / 2 + 'px';
+    }
+
     painter = new SketchPainter(svg);
 
-    painter.paint(initialAudioData, '');
-    painter.paintTitle();
+    reset();
 
     recorder = new Recorder();
+}
 
-
-    setTimeout(function () {
-        loadFont();
-    }, 2000);
+function reset() {
+    painter.paint(initialAudioData, '');
+    painter.paintTitle();
 }
 
 function initGUI() {
     buttons = {};
 
     const svg = document.getElementById('gui') as any;
+
+    if (window.innerWidth < 400) {
+        svg.style['margin-left'] = -window.innerWidth / 2 + 'px';
+    }
+
     guiManager = new GuiManager(svg);
 
     buttons.record = new RecordButton(svg, guiManager.rc);
@@ -76,6 +95,7 @@ function initGUI() {
     guiManager.addButton(buttons.record);
 
     function recordStart() {
+        logEvent('record', 'start');
         painter.paintLoading();
 
         if (!buttons.stop) {
@@ -93,10 +113,15 @@ function initGUI() {
         guiManager.removeButton(buttons.record);
         guiManager.removeButton(buttons.download);
 
-        recorder.start();
+        recorder.start()
+            .catch(err => {
+                console.log(err);
+                reset();
+            });
     }
 
     function recordStop() {
+        logEvent('record', 'stop');
         recorder.stop()
             .then(() => {
                 return dataProcessor.fromRecord(recorder);
@@ -111,16 +136,24 @@ function initGUI() {
                     buttons.download.onclick(downloadImage);
                 }
                 guiManager.addButton(buttons.download);
+            })
+            .catch(err => {
+                console.log(err);
+                reset();
             });
 
         resetButtons();
     }
 
     function recordCancel() {
-        recorder.stop();
-        painter.paint(initialAudioData, '');
-        painter.paintTitle();
+        logEvent('record', 'cancel');
+        reset();
         resetButtons();
+        recorder.stop()
+            .catch(err => {
+                console.log(err);
+                reset();
+            });
     }
 
     function resetButtons() {
@@ -131,22 +164,7 @@ function initGUI() {
     }
 
     function downloadImage() {
+        logEvent('action', 'download');
         painter.exportImage();
     }
-}
-
-function loadFont() {
-    const style = document.createElement('style');
-    const node = document.createTextNode(`
-        @font-face {
-            font-family: 'xiaowei';
-            src: url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.woff')
-                format('woff'),
-                url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.otf')
-                format('opentype'),
-                url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.ttf')
-                format('truetype');
-        }
-    `);
-    style.appendChild(node);
 }

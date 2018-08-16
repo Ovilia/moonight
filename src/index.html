@@ -7,13 +7,6 @@
     <title>Moonight</title>
 
     <style>
-        @font-face {
-            font-family: 'xiaowei';
-            src: url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.woff') format('woff'),
-                url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.otf') format('opentype'),
-                url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.ttf') format('truetype');
-        }
-
         html, body {
             position: absolute;
             left: 0;
@@ -22,6 +15,7 @@
             height: 100%;
             margin: 0;
             font-family: 'xiaowei';
+            overflow: hidden;
         }
 
         #main-svg {
@@ -71,10 +65,30 @@
     <svg id="main-svg"></svg>
     <svg id="gui"></svg>
     <div id="hint">长按保存图片</div>
+
     <script>
         if (!window.MediaRecorder) {
-            document.write(decodeURI('%3Cscript src="./polyfill.js">%3C/script>'));
+            document.write(decodeURI('%3Cscript src="https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/polyfill.js">%3C/script>'));
         }
     </script>
+    <script src="https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/app.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-38205696-2"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-38205696-2');
+    </script>
+
+    <style>
+        @font-face {
+        font-family: 'xiaowei';
+        src: url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.woff') format('woff'),
+            url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.otf') format('opentype'),
+            url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.ttf') format('truetype');
+        }
+    </style>
 </body>
 </html>

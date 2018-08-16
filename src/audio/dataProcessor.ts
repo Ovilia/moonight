@@ -1,6 +1,6 @@
 import { Recorder } from './recorder';
 import { shrinkArray, normalize, trimArray, abs } from '../util/array';
-import { getAudioContext } from '../util/env';
+import { getAudioContext, logEvent } from '../util/env';
 
 export class DataProcessor {
 
@@ -18,6 +18,7 @@ export class DataProcessor {
                 resolve(fileReader.result);
             };
             fileReader.onerror = err => {
+                logEvent('error', 'fromRecord', JSON.stringify(err));
                 reject(err);
             }
             fileReader.readAsArrayBuffer(recorder.getData());
@@ -37,6 +38,7 @@ export class DataProcessor {
                 resolve(request.response);
             };
             request.onerror = err => {
+                logEvent('error', 'fromFile', JSON.stringify(err));
                 reject(err);
             }
             request.send();
@@ -55,6 +57,7 @@ export class DataProcessor {
                 resolve(data);
             }, e => {
                 console.error(e);
+                logEvent('error', 'fromArrayBuffer', JSON.stringify(e));
                 reject(e);
             });
         });
@@ -74,6 +77,8 @@ export class DataProcessor {
     }
 
     getDisplayTimeDomainData(data: Float32Array, barCnt: number): number[] {
+        logEvent('data', 'recordDuration', data.length > 1000
+            ? 'long' : 'short');
         const arr = Array.prototype.slice.call(data);
         const trimed = trimArray(normalize(abs(arr)), 0.05);
         return normalize(shrinkArray(trimed, barCnt));
