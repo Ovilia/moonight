@@ -10,6 +10,7 @@ import { CancelButton } from './gui/buttons/cancelButton';
 import { StopButton } from './gui/buttons/stopButton';
 import { GuiManager } from './gui/guiManager';
 import { mediaRecorderSupported, audioSupported } from './util/env';
+import { getUserMedia, isWeixin } from './util/device';
 
 const dataProcessor = new DataProcessor();
 
@@ -28,9 +29,26 @@ window.onload = init;
 
 
 function init() {
+    if (isWeixin()) {
+        const hint = document.getElementById('hint');
+        hint.innerHTML = '请在右上角打开浏览器访问';
+    }
+    else {
+        initGUI();
+    }
+
     if (!mediaRecorderSupported() || !audioSupported()) {
         location.href = 'not-supported.html';
     }
+
+    getUserMedia({
+        audio: true,
+        video: false
+    })
+        .then(stream => {
+            // Not record yet, just for permission
+            stream.getTracks().forEach(track => track.stop());
+        });
 
     const svg = document.getElementById('main-svg') as any;
     painter = new SketchPainter(svg);
@@ -40,7 +58,10 @@ function init() {
 
     recorder = new Recorder();
 
-    initGUI();
+
+    setTimeout(function () {
+        loadFont();
+    }, 2000);
 }
 
 function initGUI() {
@@ -87,8 +108,8 @@ function initGUI() {
                 if (!buttons.download) {
                     buttons.download = new DownloadButton(svg, guiManager.rc);
                     buttons.download.onclick(downloadImage);
-                    guiManager.addButton(buttons.download);
                 }
+                guiManager.addButton(buttons.download);
             });
 
         resetButtons();
@@ -106,6 +127,22 @@ function initGUI() {
     }
 
     function downloadImage() {
-        painter.saveImage(1000, 1000);
+        painter.exportImage();
     }
+}
+
+function loadFont() {
+    const style = document.createElement('style');
+    const node = document.createTextNode(`
+        @font-face {
+            font-family: 'xiaowei';
+            src: url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.woff')
+                format('woff'),
+                url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.otf')
+                format('opentype'),
+                url('https://webserver-1256209664.cos.ap-shanghai.myqcloud.com/moonight/xiaowei.ttf')
+                format('truetype');
+        }
+    `);
+    style.appendChild(node);
 }

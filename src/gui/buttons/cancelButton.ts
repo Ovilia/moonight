@@ -10,41 +10,20 @@ export class CancelButton extends Button {
 
 
     protected _drawIcon() {
-        const diameter = (this.style.radius - this.style.padding) * 2;
+        const diameter = (this.style.radius - this.style.padding) * 2 * 0.8;
         const dy = this.isDown ? this.style.depth : 0;
 
-        const group = createNode('g');
-        group.setAttribute('transform', 'rotate(45)');
-        group.setAttribute('transform-origin', this.style.x + ' ' + this.style.y);
+        const path1 = this.rc.linearPath([
+            [this.style.x - diameter / 2, this.style.y - diameter / 2 + dy],
+            [this.style.x + diameter / 2, this.style.y + diameter / 2 + dy]
+        ]);
+        this._svgGroup.appendChild(path1);
 
-        const width = diameter;
-        const height = diameter * 0.2;
-
-        const vertical = this.rc.rectangle(
-            this.style.x - width / 2,
-            this.style.y + dy - height / 2,
-            width,
-            height,
-            {
-                fill: 'black',
-                fillStyle: 'zigzag'
-            }
-        );
-        group.appendChild(vertical);
-
-        const horizontal = this.rc.rectangle(
-            this.style.x - height / 2,
-            this.style.y + dy - width / 2,
-            height,
-            width,
-            {
-                fill: 'black',
-                fillStyle: 'zigzag'
-            }
-        );
-        group.appendChild(horizontal);
-
-        this._svgGroup.appendChild(group);
+        const path2 = this.rc.linearPath([
+            [this.style.x - diameter / 2, this.style.y + diameter / 2 + dy],
+            [this.style.x + diameter / 2, this.style.y - diameter / 2 + dy]
+        ]);
+        this._svgGroup.appendChild(path2);
     }
 
 }

@@ -13,7 +13,7 @@ export class Recorder {
     }
 
 
-    start() {
+    start(): Promise<any> {
         if (getUserMedia) {
             return getUserMedia({
                 audio: true,

@@ -1,10 +1,12 @@
+import { qrCodeImage } from './../util/qr';
 import { titleSVGPath, titleSVGSize } from './../util/path/title';
 import { recordingSVGPath, recordingSVGSize } from './../util/path/record';
 import rough from 'roughjs';
 import { RoughSVG } from 'roughjs/bin/svg';
 
 import { Painter } from './painter';
-import { createNode } from '../util/svg';
+import { createNode, svgToCanvas } from '../util/svg';
+import { isMobile } from '../util/device';
 
 export class SketchPainter extends Painter {
 
@@ -12,6 +14,7 @@ export class SketchPainter extends Painter {
 
     protected _innerR: number;
     protected _text: SVGElement;
+    protected _title: SVGElement;
 
     constructor(svg: SVGSVGElement) {
         super(svg);
@@ -69,6 +72,7 @@ export class SketchPainter extends Painter {
             'center'
         );
         this.svg.appendChild(title);
+        this._title = title;
     }
 
     updateText(text: string) {
@@ -78,6 +82,89 @@ export class SketchPainter extends Painter {
         this._drawText(text);
     }
 
+    exportImage() {
+        const mobile = isMobile();
+
+        const outSvg = document.createElement('svg') as any;
+        outSvg.setAttribute('width', '400');
+        outSvg.setAttribute('height', '600');
+
+        if (mobile) {
+            const contentGroup = createNode('g');
+            contentGroup.innerHTML = this.svg.innerHTML;
+            contentGroup.setAttribute('transform', 'translate(0, 90)');
+            outSvg.appendChild(contentGroup);
+        }
+
+        const dpr = 2;
+        svgToCanvas(outSvg, dpr).then(canvas => {
+            if (mobile) {
+                this._wrapCanvas(canvas, dpr)
+                    .then(() => {
+                        const base64 = canvas.toDataURL('image/png');
+                        const img = document.createElement('img');
+                        img.setAttribute('src', base64);
+                        img.setAttribute('class', 'full-img');
+
+                        const oldSvg = document.getElementsByTagName('svg');
+                        const len = oldSvg.length;
+                        for (let i = 0; i < len; ++i) {
+                            document.body.removeChild(oldSvg[0]);
+                        }
+                        document.body.appendChild(img);
+
+                        const hint = document.getElementById('hint');
+                        hint.style.display = 'block';
+                    });
+            }
+            else {
+                const base64 = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.download = 'moonight.png';
+                a.href = base64.replace(/^data:image\/[^;]/,
+                    'data:application/octet-stream');
+                a.click();
+            }
+        });
+    }
+
+
+    protected _wrapCanvas(canvas: HTMLCanvasElement, dpr: number)
+        : Promise<void>
+    {
+        const ctx = canvas.getContext('2d');
+        const rc = rough.canvas(canvas);
+
+        // yue ye title
+        const titleScale = dpr * 0.4;
+        ctx.save();
+        ctx.translate(25 * dpr, 505 * dpr);
+        ctx.scale(titleScale, titleScale);
+        rc.path(titleSVGPath, {
+            fill: 'black',
+            fillStyle: 'zigzag'
+        });
+        ctx.restore();
+
+        // github
+        ctx.font = '22px Arial, sans-serif';
+        ctx.fillStyle = '#777';
+        ctx.fillText('https://umeecorn.com/moonight', 25 * dpr, 560 * dpr);
+        ctx.fillText('GitHub: Ovilia/moonight', 25 * dpr, 575 * dpr);
+
+        // qr
+        const qrImg = new Image();
+        return new Promise((resolve, reject) => {
+            qrImg.onload = () => {
+                ctx.drawImage(qrImg, 310 * dpr, 510 * dpr, 70 * dpr, 70 * dpr);
+                resolve();
+            };
+            qrImg.onerror = () => {
+                reject();
+            };
+            qrImg.src = qrCodeImage;
+        });
+    }
 
     protected _drawBars(
         data: number[],
@@ -153,7 +240,7 @@ export class SketchPainter extends Painter {
         text.textContent = words;
         this.svg.appendChild(text);
 
-        const fontSizes = [80, 70, 46, 34, 28, 22, 20, 16, 14];
+        const fontSizes = [80, 64, 46, 34, 28, 22, 20, 16, 14];
         const fontSize = fontSizes[words.length - 1];
         text.style.font = fontSize + 'px xiaowei';
 
