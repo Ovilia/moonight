@@ -128,12 +128,14 @@ export class Button {
         this._svgGroup.addEventListener('mousedown', () => {
             this.setDown(true)
         });
-        this._svgGroup.addEventListener('mouseup', event => {
-            if (typeof this._onClick === 'function') {
-                this._onClick(event);
+        document.addEventListener('mouseup', event => {
+            if(this.isDown)  {
+                if (typeof this._onClick === 'function') {
+                    this._onClick(event);
+                }
+    
+                this.setDown(false);
             }
-
-            this.setDown(false);
         });
     }
 
